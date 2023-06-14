@@ -1,0 +1,11 @@
+[package]
+name = "conv_gltf"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.56.0"
+authors = [
+  "Alorel <amolc@pm.me>",
+]
+license = "MIT"
+readme = "README.md"
+description = "Programmatic access to the toktx CLI tool"
