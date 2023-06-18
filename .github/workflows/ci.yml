@@ -1,0 +1,112 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+      - dev-0.1
+    paths-ignore:
+      - .github/CODE_OF_CONDUCT.md
+      - .github/CODEOWNERS
+      - .github/dependabot.yml
+      - .github/FUNDING.yml
+      - LICENSE
+      - .gitignore
+  pull_request:
+    paths-ignore:
+      - .github/CODE_OF_CONDUCT.md
+      - .github/CODEOWNERS
+      - .github/dependabot.yml
+      - .github/FUNDING.yml
+      - LICENSE
+      - .gitignore
+  schedule:
+    - cron: "0 5 * * 1,3,6"
+
+permissions:
+  contents: read
+
+env:
+  CARGO_INCREMENTAL: 0
+#  RUSTFLAGS: --deny warnings
+
+jobs:
+#  lint:
+#    name: Lint
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v3
+#      - name: Init toolchain
+#        uses: dtolnay/rust-toolchain@v1
+#        id: toolchain
+#        with:
+#          toolchain: stable
+#          components: rustfmt,clippy
+#      - name: Cache
+#        uses: actions/cache@v3
+#        with:
+#          path: |
+#            ~/.cargo/bin/
+#            ~/.cargo/registry/index/
+#            ~/.cargo/registry/cache/
+#            ~/.cargo/git/db/
+#            target/
+#          key: v1-cargo-lint-${{runner.os}}-${{steps.toolchain.outputs.cachekey}}-${{ hashFiles('**/Cargo.lock') }}
+#          restore-keys: v1-cargo-lint-${{runner.os}}-${{steps.toolchain.outputs.cachekey}}-
+#      - name: cargo fmt
+#        run: cargo fmt --all --check
+#      - name: Clippy
+#        run: cargo clippy --workspace --tests --all-features -- -Dclippy::correctness -Dclippy::suspicious -Dclippy::complexity -Dclippy::perf -Dclippy::style -Dclippy::pedantic
+  test:
+    name: Rust ${{matrix.toolchain}} on ${{matrix.os}}
+    runs-on: ${{matrix.os}}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+
+        toolchain:
+          - stable
+#          - nightly
+#          - 1.60.0
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Make target dir
+        run: mkdir target
+      - name: Cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: v0-cargo-test-${{runner.os}}-${{steps.toolchain.outputs.cachekey}}-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            v0-cargo-lint-${{runner.os}}-${{steps.toolchain.outputs.cachekey}}-${{ hashFiles('**/Cargo.lock') }}
+            v0-cargo-test-${{runner.os}}-${{steps.toolchain.outputs.cachekey}}-
+      - name: Check if we've already downloaded toktx
+        uses: thebinaryfelix/check-file-existence-action@1.0.0
+        id: installer_downloaded
+        with:
+          files: target/toktx-4.2.0.deb
+      - name: Download toktx
+        if: steps.installer_downloaded.outputs.exists == 'false'
+        run: wget -nc -O target/toktx-4.2.0.deb https://github.com/KhronosGroup/KTX-Software/releases/download/v4.2.0/KTX-Software-4.2.0-Linux-x86_64.deb
+      - name: Install toktx
+        run: sudo apt install ./target/toktx-4.2.0.deb
+      - name: Init toolchain
+        uses: dtolnay/rust-toolchain@v1
+        id: toolchain
+        with:
+          toolchain: ${{matrix.toolchain}}
+      - name: tmp
+        run: toktx --help
+#      - name: Build
+#        run: cargo build --workspace --tests --all-features --locked
+#      - name: Test
+#        run: cargo test --workspace --all-features --locked
