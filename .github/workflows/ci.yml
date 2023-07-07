@@ -69,12 +69,9 @@ jobs:
         id: toolchain
         with:
           toolchain: ${{matrix.toolchain}}
-      - name: ls
-        continue-on-error: true
-        run: ls
-      - name: toktx --help
-        continue-on-error: true
-        run: toktx --help
+      - run: dir
+        if: runner.os == 'Windows'
+      - run: toktx --help
 #      - name: Build
 #        run: cargo build --workspace --tests --all-features --locked
 #      - name: Test

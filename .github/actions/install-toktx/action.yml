@@ -41,7 +41,7 @@ runs:
         if: runner.os == 'Windows'
         id: DLed_win
         with:
-            files: target/toktx-${{inputs.version}}.exe
+            files: target/toktx-${{inputs.version}}.zip
       - if: runner.os == 'Windows' && steps.DLed_win.outputs.files_exists == 'false'
         shell: bash
         run: choco install wget
