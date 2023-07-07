@@ -51,3 +51,8 @@ runs:
       - if: runner.os == 'Windows'
         shell: bash
         run: unzip -o target/toktx-${{inputs.version}}.zip
+      - if: runner.os == 'Windows'
+        uses: myci-actions/export-env-var-powershell@1
+        with:
+          name: PATH
+          value: $env:PATH;${{github.workspace}}

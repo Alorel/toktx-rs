@@ -45,7 +45,6 @@ jobs:
 #          - macos-latest
           - windows-latest
     steps:
-      - run: echo ${{github.path}}
       - name: Checkout
         uses: actions/checkout@v3
       - name: Make target dir
@@ -73,7 +72,8 @@ jobs:
       - run: dir
         if: runner.os == 'Windows'
       - run: toktx --help
-        working-directory: ${{ github.workspace }}
+        env:
+          GITHUB_PATH: ${{github.path}};
 #      - name: Build
 #        run: cargo build --workspace --tests --all-features --locked
 #      - name: Test
