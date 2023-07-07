@@ -41,8 +41,8 @@ jobs:
 #          - nightly
 #          - 1.60.0
         os:
-          - ubuntu-latest
-          - macos-latest
+#          - ubuntu-latest
+#          - macos-latest
           - windows-latest
     steps:
       - name: Checkout
@@ -72,9 +72,7 @@ jobs:
       - run: dir
         if: runner.os == 'Windows'
       - run: toktx --help
-        if: runner.os != 'Windows'
-      - run: toktx.exe --help
-        if: runner.os == 'Windows'
+        working-directory: ${{ github.workspace }}
 #      - name: Build
 #        run: cargo build --workspace --tests --all-features --locked
 #      - name: Test
