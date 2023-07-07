@@ -71,10 +71,10 @@ jobs:
           toolchain: ${{matrix.toolchain}}
       - run: dir
         if: runner.os == 'Windows'
-      - run: dir
-        if: runner.os == 'Windows'
-        working-directory: target
       - run: toktx --help
+        if: runner.os != 'Windows'
+      - run: toktx.exe --help
+        if: runner.os == 'Windows'
 #      - name: Build
 #        run: cargo build --workspace --tests --all-features --locked
 #      - name: Test
