@@ -34,18 +34,17 @@ runs:
         run: wget -nc -O target/toktx-${{inputs.version}}.pkg ${{inputs.base_download_path}}/v${{ inputs.version }}/KTX-Software-${{ inputs.version }}-Darwin-x86_64.pkg
       - if: runner.os == 'macOS'
         shell: bash
-        run: sudo installer -allowUntrusted -pkg ./target/toktx-${{inputs.version}}.pkg
+        run: sudo installer -allowUntrusted -pkg ./target/toktx-${{inputs.version}}.pkg -target /
 
       # Windows
       - uses: andstor/file-existence-action@v2
         if: runner.os == 'Windows'
         id: DLed_win
         with:
-            files: target/toktx-${{inputs.version}}.pkg
+            files: target/toktx-${{inputs.version}}.exe
       - if: runner.os == 'Windows' && steps.DLed_win.outputs.files_exists == 'false'
         shell: bash
         run: wget -nc -O target/toktx-${{inputs.version}}.exe https://github.com/Alorel/toktx-rs/files/11984660/toktx.zip
       - if: runner.os == 'Windows' && steps.DLed_win.outputs.files_exists == 'false'
         shell: bash
-        working-directory: target
-        run: unzip -o toktx.zip
+        run: unzip -o target/toktx.zip toktx.exe
