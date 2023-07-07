@@ -1,0 +1,58 @@
+name: Install toktx
+description: Downloads toktx
+inputs:
+  version:
+      description: Binary version
+      default: 4.2.0
+  base_download_path:
+      description: Base URL for downloading binaries
+      default: https://github.com/KhronosGroup/KTX-Software/releases/download
+runs:
+    using: composite
+    steps:
+      # Linux
+      - uses: andstor/file-existence-action@v2
+        if: runner.os == 'Linux'
+        id: DLed_linux
+        with:
+            files: ./target/toktx-${{inputs.version}}.deb
+      - if: runner.os == 'Linux' && steps.DLed_linux.outputs.files_exists == 'false'
+        shell: bash
+        run: wget -nc -O ./target/toktx-${{inputs.version}}.deb ${{inputs.base_download_path}}/v${{ inputs.version }}/KTX-Software-${{ inputs.version }}-Linux-x86_64.deb
+      - if: runner.os == 'Linux'
+        shell: bash
+        run: sudo apt install ./target/toktx-${{inputs.version}}.deb
+
+      # macOS
+      - uses: andstor/file-existence-action@v2
+        if: runner.os == 'macOS'
+        id: DLed_mac
+        with:
+            files: target/toktx-${{inputs.version}}.pkg
+      - if: runner.os == 'macOS' && steps.DLed_mac.outputs.files_exists == 'false'
+        shell: bash
+        run: wget -nc -O target/toktx-${{inputs.version}}.pkg ${{inputs.base_download_path}}/v${{ inputs.version }}/KTX-Software-${{ inputs.version }}-Darwin-x86_64.pkg
+      - if: runner.os == 'macOS'
+        shell: bash
+        run: sudo installer -allowUntrusted -pkg ./target/toktx-${{inputs.version}}.pkg -target /
+
+      # Windows
+      - uses: andstor/file-existence-action@v2
+        if: runner.os == 'Windows'
+        id: DLed_win
+        with:
+            files: target/toktx-${{inputs.version}}.zip
+      - if: runner.os == 'Windows' && steps.DLed_win.outputs.files_exists == 'false'
+        shell: bash
+        run: choco install wget
+      - if: runner.os == 'Windows' && steps.DLed_win.outputs.files_exists == 'false'
+        shell: bash
+        run: wget -nc -O target/toktx-${{inputs.version}}.zip https://github.com/Alorel/toktx-rs/files/11984660/toktx.zip
+      - if: runner.os == 'Windows'
+        shell: bash
+        run: unzip -o target/toktx-${{inputs.version}}.zip
+      - if: runner.os == 'Windows'
+        uses: myci-actions/export-env-var-powershell@1
+        with:
+          name: PATH
+          value: $env:PATH;${{github.workspace}}
