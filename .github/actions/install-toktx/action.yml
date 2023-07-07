@@ -1,0 +1,51 @@
+name: Install toktx
+description: Downloads toktx
+inputs:
+  version:
+      description: Binary version
+      default: 4.2.0
+  base_download_path:
+      description: Base URL for downloading binaries
+      default: https://github.com/KhronosGroup/KTX-Software/releases/download
+runs:
+    using: composite
+    steps:
+        # Linux
+        - uses: thebinaryfelix/check-file-existence-action@1.0.0
+          if: runner.os == 'Linux'
+          id: DLed_linux
+          with:
+              files: target/toktx-${{inputs.version}}.deb
+        - if: runner.os == 'Linux' && steps.DLed_linux.outputs.exists == 'false'
+          shell: bash
+          run: wget -nc -O target/toktx-${{inputs.version}}.deb ${{inputs.base_download_path}}/v${{ inputs.version }}/KTX-Software-${{ inputs.version }}-Linux-x86_64.deb
+        - if: runner.os == 'Linux'
+          shell: bash
+          run: sudo apt install ./target/toktx-${{inputs.version}}.deb
+
+        # macOS
+        - uses: thebinaryfelix/check-file-existence-action@1.0.0
+          if: runner.os == 'macOS'
+          id: DLed_mac
+          with:
+              files: target/toktx-${{inputs.version}}.pkg
+        - if: runner.os == 'macOS' && steps.DLed_mac.outputs.exists == 'false'
+          shell: bash
+          run: wget -nc -O target/toktx-${{inputs.version}}.pkg ${{inputs.base_download_path}}/v${{ inputs.version }}/KTX-Software-${{ inputs.version }}-Darwin-x86_64.pkg
+        - if: runner.os == 'macOS'
+          shell: bash
+          run: sudo installer -allowUntrusted -pkg ./target/toktx-${{inputs.version}}.pkg
+
+        # Windows
+        - uses: thebinaryfelix/check-file-existence-action@1.0.0
+          if: runner.os == 'Windows'
+          id: DLed_win
+          with:
+              files: target/toktx-${{inputs.version}}.pkg
+        - if: runner.os == 'Windows' && steps.DLed_win.outputs.exists == 'false'
+          shell: bash
+          run: wget -nc -O target/toktx-${{inputs.version}}.exe https://github.com/Alorel/toktx-rs/files/11984660/toktx.zip
+        - if: runner.os == 'Windows' && steps.DLed_win.outputs.exists == 'false'
+          shell: bash
+          working-directory: target
+          run: unzip -o toktx.zip
