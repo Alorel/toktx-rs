@@ -44,6 +44,9 @@ runs:
             files: target/toktx-${{inputs.version}}.exe
       - if: runner.os == 'Windows' && steps.DLed_win.outputs.files_exists == 'false'
         shell: bash
+        run: choco install wget --no-progress
+      - if: runner.os == 'Windows' && steps.DLed_win.outputs.files_exists == 'false'
+        shell: bash
         run: wget -nc -O target/toktx-${{inputs.version}}.exe https://github.com/Alorel/toktx-rs/files/11984660/toktx.zip
       - if: runner.os == 'Windows' && steps.DLed_win.outputs.files_exists == 'false'
         shell: bash
